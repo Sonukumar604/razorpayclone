@@ -2,6 +2,7 @@ package com.example.razorpay.payment.entity;
 
 import com.example.razorpay.common.enums.PaymentMethod;
 import com.example.razorpay.common.enums.PaymentStatus;
+import com.example.razorpay.common.enums.entity.BaseEntity;
 import com.example.razorpay.common.enums.entity.Money;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,13 +15,16 @@ import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "payments")
+@Table(name = "payments", indexes = {
+        @Index(name = "idx_payment_id_merchant_id", columnList = "id, merchant_id"),
+        @Index(name = "idx_payment_order_id", columnList = "oder_id")
+})
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Payment {
+public class Payment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)

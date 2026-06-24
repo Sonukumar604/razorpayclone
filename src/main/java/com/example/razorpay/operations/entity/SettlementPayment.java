@@ -1,5 +1,6 @@
 package com.example.razorpay.operations.entity;
 
+import com.example.razorpay.common.enums.entity.BaseEntity;
 import jakarta.persistence.*;
 
 @Entity
