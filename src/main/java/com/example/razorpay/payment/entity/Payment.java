@@ -48,7 +48,7 @@ public class Payment extends BaseEntity {
     private PaymentStatus status;
 
     @Column(nullable = false)
-    private PaymentMethod paymentMethod;
+    private PaymentMethod method;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "method_details", columnDefinition = "jsonb")
