@@ -4,8 +4,7 @@ import com.example.razorpay.common.enums.PaymentMethod;
 import com.example.razorpay.payment.gateway.adapter.CardPaymentAdapter;
 import com.example.razorpay.payment.gateway.adapter.NetBankingAdapter;
 import com.example.razorpay.payment.gateway.adapter.UpiPaymentAdapter;
-import com.example.razorpay.payment.gateway.dto.PaymentAdapter;
-import org.springframework.beans.factory.annotation.Configurable;
+import com.example.razorpay.payment.gateway.PaymentAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

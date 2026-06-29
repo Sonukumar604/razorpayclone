@@ -1,6 +1,7 @@
 package com.example.razorpay.payment.service.impl;
 
 import com.example.razorpay.common.enums.OrderStatus;
+import com.example.razorpay.common.enums.PaymentMethod;
 import com.example.razorpay.common.enums.PaymentStatus;
 import com.example.razorpay.common.exception.BusinessRuleViolationException;
 import com.example.razorpay.common.exception.ResourceNotFoundException;
@@ -8,8 +9,10 @@ import com.example.razorpay.payment.dto.request.PaymentInitRequest;
 import com.example.razorpay.payment.dto.response.PaymentResponse;
 import com.example.razorpay.payment.entity.OrderRecord;
 import com.example.razorpay.payment.entity.Payment;
-import com.example.razorpay.payment.gateway.dto.PaymentGatewayRouter;
+import com.example.razorpay.payment.gateway.PaymentGatewayRouter;
 import com.example.razorpay.payment.gateway.dto.PaymentRequest;
+import com.example.razorpay.payment.gateway.dto.PaymentResult;
+import com.example.razorpay.payment.mapper.PaymentMapper;
 import com.example.razorpay.payment.repository.OrderRepository;
 import com.example.razorpay.payment.repository.PaymentRepository;
 import com.example.razorpay.payment.service.PaymentService;
@@ -29,6 +32,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentGatewayRouter paymentGatewayRouter;
+    private final PaymentMapper paymentMapper;
 
 
     @Override
@@ -56,7 +60,21 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentRequest paymentRequest = new PaymentRequest(payment.getId(),
                 request.orderId(), merchantId,
                 order.getAmount(), request.method(), request.methodDetails());
-        paymentGatewayRouter.initiate(paymentRequest);
-        return null;
+        PaymentResult result = paymentGatewayRouter.initiate(paymentRequest);
+
+        switch (result) {
+            case PaymentResult.Pending pending -> payment.setProcessorReference(pending.registrationRef());
+            case PaymentResult.Failure failure -> {
+                payment.setStatus(PaymentStatus.FAILED);
+                payment.setErrorCode(failure.errorCode());
+                payment.setErrorDescription(failure.errorDescription());
+
+            }
+        }
+
+        payment = paymentRepository.save(payment);
+        orderRepository.save(order);
+
+        return paymentMapper.toResponse(payment);
     }
 }
